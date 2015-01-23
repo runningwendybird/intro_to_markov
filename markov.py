@@ -3,6 +3,7 @@
 import sys
 import random
 from protectedwords import protec
+from tweetit import tweet_markov
 
 MAX_TWITTER_LENGTH = 140
 
@@ -96,16 +97,23 @@ def condition_text(string):
             conditioning[current] = check
 
         if conditioning[prev_char][-1] == "." or conditioning[prev_char][-1] == "?" or conditioning[prev_char][-1] == "!":
-            conditioning[current] = conditioning[current][0].upper() + conditioning[current][1:]
+            conditioning[current] = check
 
         if conditioning[current] == "i":
             conditioning[current] == "I"
+        if "i'" in conditioning[current]:
+            conditioning[current] = check
 
         s = ' '.join(conditioning)
 
     return s
 
-
+def tweet_option(tweet_string):
+    send_to_twitter = raw_input("Input 'y' to tweet this Markov Chain. ")
+    if send_to_twitter == "y":
+        tweet_markov(tweet_string)
+    else:
+        print "Alright, we won't post that one."
 
 
 def main():
@@ -123,6 +131,7 @@ def main():
     tweet = condition_text(random_text)
     print tweet
     #print len(tweet)
+    tweet_option(tweet)
 
 if __name__ == "__main__":
     main()
