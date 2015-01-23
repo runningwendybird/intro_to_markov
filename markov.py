@@ -2,7 +2,7 @@
 
 import sys
 import random
-from protectedwords import protec
+from protectedwords import WORDS_TO_CAPITALIZE
 from tweetit import tweet_markov
 
 MAX_TWITTER_LENGTH = 140
@@ -77,40 +77,52 @@ def condition_text(string):
         s = s[0 : space] + "."
 
     #s = s[0].upper() + s[1:]
-    conditioning = s.split(" ")
-    #print conditioning
-    for word in conditioning:
+    
+    # Turning string into a list, so we can iterate through each word and make changes like 
+    # capitalization that will improve the quality of the output. 
+
+    words_to_fix = s.split(" ")
+    
+    # Iterating through the list and striping whitespace. 
+    for word in words_to_fix:
         word = word.strip()
-    conditioning[0] = conditioning[0][0].upper() + conditioning[0][1:]
+    
+# Ensuring that the first word of the tweet is capitalized. Even if it starts with a quotation mark. 
+    if words_to_fix[0][0].isalpha() == False:
+        words_to_fix[0] = words_to_fix[0][0] + words_to_fix[0][1].upper() + words_to_fix[0][2:]
+    else:
+        words_to_fix[0] = words_to_fix[0][0].upper() + words_to_fix[0][1:]
+    
 
-    if conditioning[0][0].isalpha() == False:
-        conditioning[0] = conditioning[0][0] + conditioning[0][1].upper() + conditioning[0][2:]
+# Loops through our current list of words and:
+# 1 - Protected words: Checking for reserve words (nouns that should be capitalized) and ensuring they aren't put into lower case
+# 2 - Title case: First letter of a sentence is capitalized
+# 3 - "I"  pronoun: Ensuring that "I" or contractions that begin with "I" (I've, I'm, etc) are capitalized
+    for i in range(1, len(words_to_fix)):
 
-    for i in range(1,len(conditioning)):
-        current = i
-        next_char = i + 1
-        prev_char = i - 1
+        prev_char, current, next_char = (i - 1, i + 0, i + 1)
 
-        check = conditioning[current][0].upper() + conditioning[current][1:]
+        check = words_to_fix[current][0].upper() + words_to_fix[current][1:]
 
-        if check in protec:
-            conditioning[current] = check
+        if check in WORDS_TO_CAPITALIZE:
+            words_to_fix[current] = check
 
-        if conditioning[prev_char][-1] == "." or conditioning[prev_char][-1] == "?" or conditioning[prev_char][-1] == "!":
-            conditioning[current] = check
+        if words_to_fix[prev_char][-1] == "." or words_to_fix[prev_char][-1] == "?" or words_to_fix[prev_char][-1] == "!":
+            words_to_fix[current] = check
 
-        if conditioning[current] == "i":
-            conditioning[current] == "I"
-        if "i'" in conditioning[current]:
-            conditioning[current] = check
+        if words_to_fix[current] == "i":
+            words_to_fix[current] == "I"
+        if "i'" in words_to_fix[current]:
+            words_to_fix[current] = check
 
-        s = ' '.join(conditioning)
+# Now that we have checked the words, we are putting them back into a string. 
+    s = ' '.join(words_to_fix)
 
     return s
 
 def tweet_option(tweet_string):
     send_to_twitter = raw_input("Input 'y' to tweet this Markov Chain. ")
-    if send_to_twitter == "y":
+    if send_to_twitter.lower() == "y":
         tweet_markov(tweet_string)
     else:
         print "Alright, we won't post that one."
@@ -123,10 +135,13 @@ def main():
 
 
     #input_text = open(raw_input("Enter file to open: "))
-    input_text = open(file_to_open)
-    chain_dict = make_chains(input_text)
+
+    # FIXME: better var names for files/paths/context-text
+
+    input_file = open(file_to_open)
+    chain_dict = make_chains(input_file)
     random_text = make_text(chain_dict)
-    input_text.close()
+    input_file.close()
     #print random_text[0:140]
     tweet = condition_text(random_text)
     print tweet
