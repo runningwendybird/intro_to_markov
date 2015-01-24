@@ -3,7 +3,7 @@
 import sys
 import random
 from protectedwords import WORDS_TO_CAPITALIZE
-from tweetit import tweet_markov
+#from tweetit import tweet_markov
 
 MAX_TWITTER_LENGTH = 140
 
@@ -120,12 +120,12 @@ def condition_text(string):
 
     return s
 
-def tweet_option(tweet_string):
-    send_to_twitter = raw_input("Input 'y' to tweet this Markov Chain. ")
-    if send_to_twitter.lower() == "y":
-        tweet_markov(tweet_string)
-    else:
-        print "Alright, we won't post that one."
+# def tweet_option(tweet_string):
+#     send_to_twitter = raw_input("Input 'y' to tweet this Markov Chain. ")
+#     if send_to_twitter.lower() == "y":
+#         tweet_markov(tweet_string)
+#     else:
+#         print "Alright, we won't post that one."
 
 
 def main():
@@ -146,7 +146,7 @@ def main():
     tweet = condition_text(random_text)
     print tweet
     #print len(tweet)
-    tweet_option(tweet)
+    #tweet_option(tweet)
 
 if __name__ == "__main__":
     main()
